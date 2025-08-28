@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { RoleSelector } from "@/components/RoleSelector";
 import { LoginForm } from "@/components/LoginForm";
 import { StudentForm } from "@/components/StudentForm";
+import { ApprovalDashboard } from "@/components/ApprovalDashboard";
 
 type AppState = "role-selection" | "login" | "dashboard";
 
@@ -85,18 +86,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header user={user} onLogout={handleLogout} />
       {selectedRole === "student" && <StudentForm />}
-      {selectedRole !== "student" && (
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-academic-navy mb-4">
-              {user?.role} Dashboard
-            </h2>
-            <p className="text-academic-gray">
-              Dashboard functionality coming soon...
-            </p>
-          </div>
-        </div>
-      )}
+      {selectedRole !== "student" && <ApprovalDashboard role={selectedRole} />}
     </div>
   );
 };

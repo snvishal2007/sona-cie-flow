@@ -343,22 +343,13 @@ export const StudentForm = () => {
                     <SelectTrigger>
                       <SelectValue placeholder="Select Department" />
                     </SelectTrigger>
-                    <SelectContent>
-                      {departments.map((dept) => (
-                        <SelectItem key={dept.value} value={dept.value}>
-                          <div 
-                            className="flex items-center justify-between w-full cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDepartmentPage(dept.value);
-                            }}
-                          >
-                            {dept.label}
-                            <ExternalLink className="h-3 w-3 ml-2" />
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                     <SelectContent>
+                       {departments.map((dept) => (
+                         <SelectItem key={dept.value} value={dept.value}>
+                           {dept.label}
+                         </SelectItem>
+                       ))}
+                     </SelectContent>
                   </Select>
                 </div>
 
