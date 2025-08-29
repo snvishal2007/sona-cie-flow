@@ -84,7 +84,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} onLogout={handleLogout} />
+      <Header user={user} onLogout={handleLogout} userName={user?.name} />
       {selectedRole === "student" && <StudentForm />}
       {selectedRole !== "student" && <ApprovalDashboard role={selectedRole} />}
     </div>

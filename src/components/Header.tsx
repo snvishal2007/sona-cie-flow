@@ -8,9 +8,10 @@ interface HeaderProps {
     email: string;
   };
   onLogout?: () => void;
+  userName?: string;
 }
 
-export const Header = ({ user, onLogout }: HeaderProps) => {
+export const Header = ({ user, onLogout, userName }: HeaderProps) => {
   return (
     <header className="bg-background border-b border-border shadow-soft">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -20,7 +21,9 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-academic-navy">CIE Re-Test Portal</h1>
-            <p className="text-sm text-academic-gray">Sona College of Technology</p>
+            <p className="text-sm text-academic-gray">
+              {userName ? `Welcome, ${userName}` : "Sona College of Technology"}
+            </p>
           </div>
         </div>
 

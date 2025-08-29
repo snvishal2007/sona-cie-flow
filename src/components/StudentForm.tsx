@@ -93,18 +93,18 @@ const departments = [
 ];
 
 const itFaculty = [
-  "Dr. A. Rama Mohan Reddy", "Dr. B. Srinivasan", "Dr. C. Venkatesh",
-  "Dr. D. Malathi", "Dr. E. Priya", "Dr. F. Kumar", "Dr. G. Lakshmi",
-  "Dr. H. Rajesh", "Dr. I. Meera", "Dr. J. Anand", "Dr. K. Divya",
-  "Dr. L. Prasad", "Dr. M. Sangeetha", "Dr. N. Ravi", "Dr. O. Kavitha",
-  "Prof. P. Suresh", "Prof. Q. Nandini", "Prof. R. Vijay", "Prof. S. Deepa",
-  "Prof. T. Mohan", "Prof. U. Preethi", "Prof. V. Kiran", "Prof. W. Swathi",
-  "Prof. X. Naveen", "Prof. Y. Rekha", "Prof. Z. Arun", "Dr. AA. Bhavani",
-  "Dr. BB. Srikanth", "Dr. CC. Lavanya", "Dr. DD. Mahesh", "Dr. EE. Sowmya",
-  "Prof. FF. Ramesh", "Prof. GG. Padma", "Prof. HH. Gopal", "Prof. II. Shanti",
-  "Prof. JJ. Bala", "Prof. KK. Satish", "Prof. LL. Vasanti", "Prof. MM. Hari",
-  "Prof. NN. Geetha", "Prof. OO. Sunil", "Prof. PP. Radha", "Prof. QQ. Manoj",
-  "Prof. RR. Usha", "Prof. SS. Vinod", "Prof. TT. Latha"
+  "dr.a.ramamohanreddy@sonatech.ac.in", "dr.b.srinivasan@sonatech.ac.in", "dr.c.venkatesh@sonatech.ac.in",
+  "dr.d.malathi@sonatech.ac.in", "dr.e.priya@sonatech.ac.in", "dr.f.kumar@sonatech.ac.in", "dr.g.lakshmi@sonatech.ac.in",
+  "dr.h.rajesh@sonatech.ac.in", "dr.i.meera@sonatech.ac.in", "dr.j.anand@sonatech.ac.in", "dr.k.divya@sonatech.ac.in",
+  "dr.l.prasad@sonatech.ac.in", "dr.m.sangeetha@sonatech.ac.in", "dr.n.ravi@sonatech.ac.in", "dr.o.kavitha@sonatech.ac.in",
+  "prof.p.suresh@sonatech.ac.in", "prof.q.nandini@sonatech.ac.in", "prof.r.vijay@sonatech.ac.in", "prof.s.deepa@sonatech.ac.in",
+  "prof.t.mohan@sonatech.ac.in", "prof.u.preethi@sonatech.ac.in", "prof.v.kiran@sonatech.ac.in", "prof.w.swathi@sonatech.ac.in",
+  "prof.x.naveen@sonatech.ac.in", "prof.y.rekha@sonatech.ac.in", "prof.z.arun@sonatech.ac.in", "dr.aa.bhavani@sonatech.ac.in",
+  "dr.bb.srikanth@sonatech.ac.in", "dr.cc.lavanya@sonatech.ac.in", "dr.dd.mahesh@sonatech.ac.in", "dr.ee.sowmya@sonatech.ac.in",
+  "prof.ff.ramesh@sonatech.ac.in", "prof.gg.padma@sonatech.ac.in", "prof.hh.gopal@sonatech.ac.in", "prof.ii.shanti@sonatech.ac.in",
+  "prof.jj.bala@sonatech.ac.in", "prof.kk.satish@sonatech.ac.in", "prof.ll.vasanti@sonatech.ac.in", "prof.mm.hari@sonatech.ac.in",
+  "prof.nn.geetha@sonatech.ac.in", "prof.oo.sunil@sonatech.ac.in", "prof.pp.radha@sonatech.ac.in", "prof.qq.manoj@sonatech.ac.in",
+  "prof.rr.usha@sonatech.ac.in", "prof.ss.vinod@sonatech.ac.in", "prof.tt.latha@sonatech.ac.in"
 ];
 
 const getCoursesBySemester = (dept: string, semester: string) => {
@@ -194,6 +194,13 @@ export const StudentForm = () => {
 
   const handleCourseChange = (index: number, field: "retest" | "improvement", value: boolean) => {
     const newCourses = [...courses];
+    
+    if (value) {
+      // If selecting this option, unselect the other option for this course
+      const otherField = field === "retest" ? "improvement" : "retest";
+      newCourses[index][otherField] = false;
+    }
+    
     newCourses[index][field] = value;
     setCourses(newCourses);
 
@@ -457,35 +464,41 @@ export const StudentForm = () => {
                       {courses.filter(c => c.retest || c.improvement).length}/7 selected
                     </span>
                   </div>
-                  <div className="border rounded-lg overflow-hidden">
-                    <div className="grid grid-cols-4 gap-4 p-4 bg-academic-blue-light font-medium text-sm">
-                      <div>Course Code</div>
-                      <div>Course Name</div>
-                      <div className="text-center">Re-test</div>
-                      <div className="text-center">Improvement</div>
-                    </div>
-                    {courses.map((course, index) => (
-                      <div key={course.code} className="grid grid-cols-4 gap-4 p-4 border-t">
-                        <div className="font-mono text-sm">{course.code}</div>
-                        <div className="text-sm">{course.name}</div>
-                        <div className="text-center">
-                          <Checkbox
-                            checked={course.retest}
-                            onCheckedChange={(checked) => 
-                              handleCourseChange(index, "retest", checked as boolean)
-                            }
-                          />
-                        </div>
-                        <div className="text-center">
-                          <Checkbox
-                            checked={course.improvement}
-                            onCheckedChange={(checked) => 
-                              handleCourseChange(index, "improvement", checked as boolean)
-                            }
-                          />
-                        </div>
-                      </div>
-                    ))}
+                   <div className="border rounded-lg overflow-hidden">
+                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-2 lg:gap-4 p-3 lg:p-4 bg-academic-blue-light font-medium text-sm">
+                       <div className="lg:block hidden">Course Code</div>
+                       <div className="lg:block hidden">Course Name</div>
+                       <div className="text-center lg:block hidden">Re-test</div>
+                       <div className="text-center lg:block hidden">Improvement</div>
+                     </div>
+                     {courses.map((course, index) => (
+                       <div key={course.code} className="grid grid-cols-1 lg:grid-cols-4 gap-2 lg:gap-4 p-3 lg:p-4 border-t">
+                         <div className="lg:hidden text-xs text-academic-gray font-medium">Course Code:</div>
+                         <div className="font-mono text-sm mb-2 lg:mb-0">{course.code}</div>
+                         <div className="lg:hidden text-xs text-academic-gray font-medium">Course Name:</div>
+                         <div className="text-sm mb-3 lg:mb-0">{course.name}</div>
+                         <div className="flex items-center gap-4 lg:justify-center">
+                           <div className="flex items-center gap-2">
+                             <span className="lg:hidden text-sm">Re-test:</span>
+                             <Checkbox
+                               checked={course.retest}
+                               onCheckedChange={(checked) => 
+                                 handleCourseChange(index, "retest", checked as boolean)
+                               }
+                             />
+                           </div>
+                           <div className="flex items-center gap-2">
+                             <span className="lg:hidden text-sm">Improvement:</span>
+                             <Checkbox
+                               checked={course.improvement}
+                               onCheckedChange={(checked) => 
+                                 handleCourseChange(index, "improvement", checked as boolean)
+                               }
+                             />
+                           </div>
+                         </div>
+                       </div>
+                     ))}
                   </div>
                 </div>
               )}
