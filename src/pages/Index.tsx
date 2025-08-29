@@ -23,7 +23,7 @@ const Index = () => {
     setAppState("login");
   };
 
-  const handleLogin = (credentials: { email: string; otp?: string }) => {
+  const handleLogin = (credentials: { email: string }) => {
     // Simulate successful login
     const mockUsers: Record<string, User> = {
       student: {

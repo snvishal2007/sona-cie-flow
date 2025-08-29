@@ -3,19 +3,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Mail, Lock, Shield } from "lucide-react";
+import { ArrowLeft, Mail, Lock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface LoginFormProps {
   role: string;
   onBack: () => void;
-  onLogin: (credentials: { email: string; otp?: string }) => void;
+  onLogin: (credentials: { email: string }) => void;
 }
 
 export const LoginForm = ({ role, onBack, onLogin }: LoginFormProps) => {
-  const [step, setStep] = useState<"email" | "otp">("email");
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { toast } = useToast();
 
   const getRoleTitle = (role: string) => {
     const titles: Record<string, string> = {
@@ -28,26 +31,57 @@ export const LoginForm = ({ role, onBack, onLogin }: LoginFormProps) => {
     return titles[role] || role;
   };
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate OTP sending
-    setTimeout(() => {
-      setLoading(false);
-      setStep("otp");
-    }, 2000);
-  };
 
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    // Simulate OTP verification
-    setTimeout(() => {
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`
+          }
+        });
+
+        if (error) {
+          toast({
+            title: "Sign up failed",
+            description: error.message,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Check your email",
+            description: "We've sent you a confirmation link to complete your registration."
+          });
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          toast({
+            title: "Sign in failed", 
+            description: error.message,
+            variant: "destructive"
+          });
+        } else {
+          onLogin({ email });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Authentication error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setLoading(false);
-      onLogin({ email, otp });
-    }, 1500);
+    }
   };
 
   return (
@@ -64,84 +98,73 @@ export const LoginForm = ({ role, onBack, onLogin }: LoginFormProps) => {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <CardTitle className="text-2xl text-academic-navy">
-              {getRoleTitle(role)} Login
+              {getRoleTitle(role)} {isSignUp ? "Sign Up" : "Login"}
             </CardTitle>
             <CardDescription>
-              Sign in with your Sona College email
+              {isSignUp ? "Create your account" : "Sign in"} with your Sona College email
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {step === "email" ? (
-              <form onSubmit={handleEmailSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-academic-navy">
-                    College Email
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-academic-gray" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="your.name@sonatech.ac.in"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-academic-navy">
+                  College Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-academic-gray" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.name@sonatech.ac.in"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
                 </div>
-                <Button 
-                  type="submit" 
-                  variant="academic" 
-                  className="w-full"
-                  disabled={loading}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-academic-navy">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-academic-gray" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <Button 
+                type="submit" 
+                variant="academic" 
+                className="w-full"
+                disabled={loading}
+              >
+                {loading 
+                  ? (isSignUp ? "Creating Account..." : "Signing In...") 
+                  : (isSignUp ? "Sign Up" : "Sign In")
+                }
+              </Button>
+              <div className="text-center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="text-academic-blue hover:text-academic-blue-dark"
                 >
-                  {loading ? "Sending OTP..." : "Send OTP"}
+                  {isSignUp 
+                    ? "Already have an account? Sign in" 
+                    : "Don't have an account? Sign up"
+                  }
                 </Button>
-              </form>
-            ) : (
-              <form onSubmit={handleOtpSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="otp" className="text-academic-navy">
-                    Enter OTP
-                  </Label>
-                  <div className="relative">
-                    <Shield className="absolute left-3 top-3 h-4 w-4 text-academic-gray" />
-                    <Input
-                      id="otp"
-                      type="text"
-                      placeholder="6-digit OTP"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      className="pl-10 text-center tracking-widest"
-                      maxLength={6}
-                      required
-                    />
-                  </div>
-                  <p className="text-sm text-academic-gray">
-                    OTP sent to {email}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setStep("email")}
-                    className="flex-1"
-                  >
-                    Back
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    variant="academic" 
-                    className="flex-1"
-                    disabled={loading}
-                  >
-                    {loading ? "Verifying..." : "Login"}
-                  </Button>
-                </div>
-              </form>
-            )}
+              </div>
+            </form>
           </CardContent>
         </Card>
       </div>
