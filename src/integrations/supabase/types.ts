@@ -14,7 +14,158 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          application_type: Database["public"]["Enums"]["application_type"]
+          class_teacher_approved_at: string | null
+          coe_approved_at: string | null
+          course_id: string
+          created_at: string | null
+          faculty_approved_at: string | null
+          hod_approved_at: string | null
+          id: string
+          reason: string
+          status: Database["public"]["Enums"]["application_status"] | null
+          student_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          application_type: Database["public"]["Enums"]["application_type"]
+          class_teacher_approved_at?: string | null
+          coe_approved_at?: string | null
+          course_id: string
+          created_at?: string | null
+          faculty_approved_at?: string | null
+          hod_approved_at?: string | null
+          id?: string
+          reason: string
+          status?: Database["public"]["Enums"]["application_status"] | null
+          student_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          application_type?: Database["public"]["Enums"]["application_type"]
+          class_teacher_approved_at?: string | null
+          coe_approved_at?: string | null
+          course_id?: string
+          created_at?: string | null
+          faculty_approved_at?: string | null
+          hod_approved_at?: string | null
+          id?: string
+          reason?: string
+          status?: Database["public"]["Enums"]["application_status"] | null
+          student_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "applications_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          class_teacher_id: string
+          course_code: string
+          course_name: string
+          created_at: string | null
+          department: string
+          faculty_email: string
+          id: string
+          section: string
+          semester: number
+          updated_at: string | null
+        }
+        Insert: {
+          class_teacher_id: string
+          course_code: string
+          course_name: string
+          created_at?: string | null
+          department: string
+          faculty_email: string
+          id?: string
+          section: string
+          semester: number
+          updated_at?: string | null
+        }
+        Update: {
+          class_teacher_id?: string
+          course_code?: string
+          course_name?: string
+          created_at?: string | null
+          department?: string
+          faculty_email?: string
+          id?: string
+          section?: string
+          semester?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_class_teacher_id_fkey"
+            columns: ["class_teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          department: string | null
+          email: string
+          full_name: string
+          id: string
+          is_first_login: boolean | null
+          role: Database["public"]["Enums"]["user_role"]
+          roll_number: string | null
+          section: string | null
+          semester: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          department?: string | null
+          email: string
+          full_name: string
+          id?: string
+          is_first_login?: boolean | null
+          role: Database["public"]["Enums"]["user_role"]
+          roll_number?: string | null
+          section?: string | null
+          semester?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          department?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          is_first_login?: boolean | null
+          role?: Database["public"]["Enums"]["user_role"]
+          roll_number?: string | null
+          section?: string | null
+          semester?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +174,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      application_status:
+        | "pending"
+        | "approved_by_class_teacher"
+        | "approved_by_faculty"
+        | "approved_by_hod"
+        | "approved_by_coe"
+        | "rejected"
+      application_type: "retest" | "improvement"
+      user_role: "student" | "class_teacher" | "faculty" | "hod" | "coe"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +309,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      application_status: [
+        "pending",
+        "approved_by_class_teacher",
+        "approved_by_faculty",
+        "approved_by_hod",
+        "approved_by_coe",
+        "rejected",
+      ],
+      application_type: ["retest", "improvement"],
+      user_role: ["student", "class_teacher", "faculty", "hod", "coe"],
+    },
   },
 } as const
