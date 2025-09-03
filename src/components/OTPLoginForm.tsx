@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft, Mail, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -23,7 +23,36 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
   const { toast } = useToast();
+
+  // Countdown timer for resend cooldown
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  // Check OTP expiry
+  useEffect(() => {
+    if (otpExpiry && otpSent) {
+      const checkExpiry = setInterval(() => {
+        if (new Date() > otpExpiry) {
+          setOtpSent(false);
+          setOtp("");
+          setOtpExpiry(null);
+          toast({
+            title: "OTP Expired",
+            description: "Your OTP has expired. Please request a new one.",
+            variant: "destructive"
+          });
+        }
+      }, 1000);
+      return () => clearInterval(checkExpiry);
+    }
+  }, [otpExpiry, otpSent, toast]);
 
   const getRoleTitle = (role: string) => {
     const titles: Record<string, string> = {
@@ -69,9 +98,11 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
         });
       } else {
         setOtpSent(true);
+        setResendCooldown(60); // 60 second cooldown
+        setOtpExpiry(new Date(Date.now() + 5 * 60 * 1000)); // 5 minutes expiry
         toast({
           title: "OTP Sent",
-          description: "Check your email for the verification code"
+          description: "Check your email for the 6-digit verification code (valid for 5 minutes)"
         });
       }
     } catch (error) {
@@ -168,11 +199,17 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
               <form onSubmit={handleVerifyOTP} className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-academic-navy">
-                    Enter OTP sent to {email}
+                    Enter 6-digit OTP sent to {email}
                   </Label>
+                  {otpExpiry && (
+                    <div className="flex items-center justify-center text-sm text-academic-gray">
+                      <Clock className="h-4 w-4 mr-1" />
+                      Expires in: {Math.max(0, Math.ceil((otpExpiry.getTime() - Date.now()) / 1000 / 60))} minutes
+                    </div>
+                  )}
                   <div className="flex justify-center">
                     <InputOTP
-                      maxLength={5}
+                      maxLength={6}
                       value={otp}
                       onChange={(value) => setOtp(value)}
                     >
@@ -182,6 +219,7 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
                         <InputOTPSlot index={2} />
                         <InputOTPSlot index={3} />
                         <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
                       </InputOTPGroup>
                     </InputOTP>
                   </div>
@@ -189,20 +227,18 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
                 <Button 
                   type="submit" 
                   className="w-full bg-gradient-primary hover:bg-primary-hover text-white"
-                  disabled={loading || otp.length !== 5}
+                  disabled={loading || otp.length !== 6}
                 >
                   {loading ? "Verifying..." : "Verify & Login"}
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => {
-                    setOtpSent(false);
-                    setOtp("");
-                  }}
+                  onClick={handleSendOTP}
+                  disabled={resendCooldown > 0}
                   className="w-full text-academic-blue hover:text-academic-blue-dark"
                 >
-                  Resend OTP
+                  {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : "Resend OTP"}
                 </Button>
               </form>
             )}
