@@ -172,7 +172,7 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
                   </Label>
                   <div className="flex justify-center">
                     <InputOTP
-                      maxLength={6}
+                      maxLength={5}
                       value={otp}
                       onChange={(value) => setOtp(value)}
                     >
@@ -182,7 +182,6 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
                         <InputOTPSlot index={2} />
                         <InputOTPSlot index={3} />
                         <InputOTPSlot index={4} />
-                        <InputOTPSlot index={5} />
                       </InputOTPGroup>
                     </InputOTP>
                   </div>
@@ -190,7 +189,7 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
                 <Button 
                   type="submit" 
                   className="w-full bg-gradient-primary hover:bg-primary-hover text-white"
-                  disabled={loading || otp.length !== 6}
+                  disabled={loading || otp.length !== 5}
                 >
                   {loading ? "Verifying..." : "Verify & Login"}
                 </Button>
