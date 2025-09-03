@@ -54,7 +54,10 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/`
+          shouldCreateUser: true,
+          data: {
+            role: role
+          }
         }
       });
 
