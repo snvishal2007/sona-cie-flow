@@ -65,6 +65,10 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
     return titles[role] || role;
   };
 
+  const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -80,35 +84,39 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
         return;
       }
 
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: true,
-          data: {
-            role: role
-          }
-        }
+      // Generate 6-digit OTP
+      const generatedOtp = generateOTP();
+
+      // Store OTP in the backend
+      const { error: storeError } = await supabase.functions.invoke('verify-otp/store', {
+        body: { email, otp: generatedOtp, role }
       });
 
-      if (error) {
-        toast({
-          title: "Failed to send OTP",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        setOtpSent(true);
-        setResendCooldown(60); // 60 second cooldown
-        setOtpExpiry(new Date(Date.now() + 5 * 60 * 1000)); // 5 minutes expiry
-        toast({
-          title: "OTP Sent",
-          description: "Check your email for the 6-digit verification code (valid for 5 minutes)"
-        });
+      if (storeError) {
+        throw new Error(storeError.message);
       }
-    } catch (error) {
+
+      // Send OTP via email
+      const { error: sendError } = await supabase.functions.invoke('send-otp', {
+        body: { email, otp: generatedOtp, role }
+      });
+
+      if (sendError) {
+        throw new Error(sendError.message);
+      }
+
+      setOtpSent(true);
+      setResendCooldown(60); // 60 second cooldown
+      setOtpExpiry(new Date(Date.now() + 5 * 60 * 1000)); // 5 minutes expiry
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: "OTP Sent",
+        description: "Check your email for the 6-digit verification code (valid for 5 minutes)"
+      });
+
+    } catch (error: any) {
+      toast({
+        title: "Failed to send OTP",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -121,10 +129,9 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        email,
-        token: otp,
-        type: 'email'
+      // Verify OTP with our custom backend
+      const { data, error } = await supabase.functions.invoke('verify-otp', {
+        body: { email, otp, role }
       });
 
       if (error) {
@@ -133,13 +140,20 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
           description: error.message,
           variant: "destructive"
         });
-      } else if (data.user) {
+      } else if (data?.success) {
+        // OTP verified successfully
         onLogin(data.user);
+        toast({
+          title: "Login Successful",
+          description: "You have been logged in successfully!"
+        });
+      } else {
+        throw new Error("Verification failed");
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Verification Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: error.message || "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
     } finally {
