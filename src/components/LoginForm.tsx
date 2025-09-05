@@ -53,8 +53,8 @@ export const LoginForm = ({ role, onBack, onLogin }: LoginFormProps) => {
           });
         } else {
           toast({
-            title: "Check your email",
-            description: "We've sent you a confirmation link to complete your registration."
+            title: "Account Created Successfully",
+            description: "Please check your email and click the confirmation link to activate your account."
           });
         }
       } else {

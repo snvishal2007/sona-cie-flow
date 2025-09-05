@@ -69,20 +69,18 @@ export const PhoneOTPLoginForm = ({ role, onBack, onLogin }: PhoneOTPLoginFormPr
     try {
       const generatedOTP = generateOTP();
       
-      // Store OTP in edge function
-      const { error: storeError } = await supabase.functions.invoke('verify-otp', {
+      // Send OTP via edge function
+      const { error: sendError } = await supabase.functions.invoke('send-otp', {
         body: { 
           email, 
           otp: generatedOTP, 
           role,
-          phone,
-          action: 'store'
+          phone
         }
       });
 
-      if (storeError) throw storeError;
+      if (sendError) throw sendError;
 
-      // Send OTP via SMS (placeholder - you'd implement actual SMS service)
       toast({
         title: "OTP Sent",
         description: `OTP sent to ${phone}. Check your messages.`,
