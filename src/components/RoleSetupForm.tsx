@@ -169,7 +169,37 @@ export const RoleSetupForm = ({ user, onSetupComplete }: RoleSetupFormProps) => 
                     </SelectContent>
                   </Select>
                 </div>
-                {(profile.role === 'student' || profile.role === 'class_teacher') && (
+                {profile.role === 'student' && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="semester">Semester</Label>
+                      <Select onValueChange={(value) => setProfile({...profile, semester: value})} required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select semester" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {semesters.map((sem) => (
+                            <SelectItem key={sem} value={sem.toString()}>{sem}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="section">Section</Label>
+                      <Select onValueChange={(value) => setProfile({...profile, section: value})} required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select section" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {sections.map((sec) => (
+                            <SelectItem key={sec} value={sec}>{sec}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
+                {profile.role === 'class_teacher' && (
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="semester">Semester</Label>
@@ -214,46 +244,69 @@ export const RoleSetupForm = ({ user, onSetupComplete }: RoleSetupFormProps) => 
               )}
 
               {profile.role === 'class_teacher' && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <Label className="text-lg font-semibold">Courses (Max 10)</Label>
-                    <Button
-                      type="button"
-                      onClick={handleAddCourse}
-                      disabled={courses.length >= 10}
-                      className="bg-academic-blue hover:bg-academic-blue-dark text-white"
-                    >
-                      Add Course
-                    </Button>
-                  </div>
-                  {courses.map((course, index) => (
-                    <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 p-4 border rounded-lg">
-                      <Input
-                        placeholder="Course Code"
-                        value={course.courseCode}
-                        onChange={(e) => handleCourseChange(index, 'courseCode', e.target.value)}
-                      />
-                      <Input
-                        placeholder="Course Name"
-                        value={course.courseName}
-                        onChange={(e) => handleCourseChange(index, 'courseName', e.target.value)}
-                      />
-                      <Input
-                        placeholder="Faculty Email"
-                        type="email"
-                        value={course.facultyEmail}
-                        onChange={(e) => handleCourseChange(index, 'facultyEmail', e.target.value)}
-                      />
+                <>
+                  <div className="space-y-4">
+                    <Label className="text-lg font-semibold text-academic-navy">
+                      Course Information
+                    </Label>
+                    <div className="flex justify-between items-center">
+                      <Label className="text-md font-semibold">Courses (Max 10)</Label>
                       <Button
                         type="button"
-                        variant="destructive"
-                        onClick={() => handleRemoveCourse(index)}
+                        onClick={handleAddCourse}
+                        disabled={courses.length >= 10}
+                        className="bg-academic-blue hover:bg-academic-blue-dark text-white"
                       >
-                        Remove
+                        Add Course
                       </Button>
                     </div>
-                  ))}
-                </div>
+                    {courses.map((course, index) => (
+                      <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg">
+                        <div className="space-y-2">
+                          <Label htmlFor={`course-code-${index}`}>Course Code</Label>
+                          <Input
+                            id={`course-code-${index}`}
+                            placeholder="e.g., CS101"
+                            value={course.courseCode}
+                            onChange={(e) => handleCourseChange(index, 'courseCode', e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`course-name-${index}`}>Course Name</Label>
+                          <Input
+                            id={`course-name-${index}`}
+                            placeholder="e.g., Programming Fundamentals"
+                            value={course.courseName}
+                            onChange={(e) => handleCourseChange(index, 'courseName', e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`faculty-email-${index}`}>Faculty Outlook Email</Label>
+                          <Input
+                            id={`faculty-email-${index}`}
+                            type="email"
+                            placeholder="faculty@sonatech.ac.in"
+                            value={course.facultyEmail}
+                            onChange={(e) => handleCourseChange(index, 'facultyEmail', e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="md:col-span-3 flex justify-end">
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleRemoveCourse(index)}
+                          >
+                            Remove Course
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
 
               <Button 

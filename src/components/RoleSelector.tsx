@@ -39,8 +39,8 @@ const roles = [
     color: "text-destructive"
   },
   {
-    id: "ceo",
-    title: "CEO",
+    id: "coe",
+    title: "COE",
     description: "Final authority and oversight",
     icon: Crown,
     color: "text-academic-navy"

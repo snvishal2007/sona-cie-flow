@@ -188,7 +188,7 @@ export const NewApprovalDashboard = ({ user, userProfile }: NewApprovalDashboard
       class_teacher: "Class Teacher",
       faculty: "Faculty",
       hod: "Head of Department",
-      coe: "COE"
+      coe: "Chief Operating Executive"
     };
     return roleNames[role as keyof typeof roleNames] || role;
   };

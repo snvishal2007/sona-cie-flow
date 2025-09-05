@@ -10,6 +10,8 @@ interface VerifyOtpRequest {
   email: string;
   otp: string;
   role: string;
+  phone?: string;
+  action?: string;
 }
 
 interface OtpSession {

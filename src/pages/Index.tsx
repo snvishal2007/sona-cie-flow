@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { RoleSelector } from "@/components/RoleSelector";
 import { OTPLoginForm } from "@/components/OTPLoginForm";
+import { LoginForm } from "@/components/LoginForm";
+import { PhoneOTPLoginForm } from "@/components/PhoneOTPLoginForm";
 import { RoleSetupForm } from "@/components/RoleSetupForm";
 import { NewStudentForm } from "@/components/NewStudentForm";
 import { NewApprovalDashboard } from "@/components/NewApprovalDashboard";
@@ -134,9 +136,19 @@ const Index = () => {
     return <RoleSelector onRoleSelect={handleRoleSelect} />;
   }
 
-  if (appState === "login") {
+  if (appState === "login" && selectedRole === "student") {
     return (
-      <OTPLoginForm
+      <LoginForm
+        role={selectedRole}
+        onBack={handleBackToRoles}
+        onLogin={handleLogin}
+      />
+    );
+  }
+
+  if (appState === "login" && selectedRole !== "student") {
+    return (
+      <PhoneOTPLoginForm
         role={selectedRole}
         onBack={handleBackToRoles}
         onLogin={handleLogin}
