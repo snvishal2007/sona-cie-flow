@@ -41,7 +41,10 @@ export const LoginForm = ({ role, onBack, onLogin }: LoginFormProps) => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              email_confirm: false
+            }
           }
         });
 
@@ -54,8 +57,9 @@ export const LoginForm = ({ role, onBack, onLogin }: LoginFormProps) => {
         } else {
           toast({
             title: "Account Created Successfully",
-            description: "Please check your email and click the confirmation link to activate your account."
+            description: "You can now sign in with your credentials."
           });
+          setIsSignUp(false);
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
