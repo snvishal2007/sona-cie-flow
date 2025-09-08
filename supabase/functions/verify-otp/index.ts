@@ -99,11 +99,12 @@ const handler = async (req: Request): Promise<Response> => {
       let userId: string;
 
       if (!existingUser.user) {
-        // Create new user
+        // Create new user - auto-determine role from email
+        const userRole = email.endsWith('@sonatech.ac.in') ? 'student' : 'class_teacher';
         const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
           email,
           email_confirm: true,
-          user_metadata: { role }
+          user_metadata: { role: userRole }
         });
 
         if (createError) {
@@ -111,7 +112,7 @@ const handler = async (req: Request): Promise<Response> => {
         }
 
         userId = newUser.user!.id;
-        console.log(`Created new user: ${email} with role: ${role}`);
+        console.log(`Created new user: ${email} with role: ${userRole}`);
       } else {
         userId = existingUser.user.id;
         console.log(`Found existing user: ${email}`);

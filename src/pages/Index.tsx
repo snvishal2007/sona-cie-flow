@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { RoleSelector } from "@/components/RoleSelector";
 import { OTPLoginForm } from "@/components/OTPLoginForm";
-import { LoginForm } from "@/components/LoginForm";
-import { PhoneOTPLoginForm } from "@/components/PhoneOTPLoginForm";
 import { RoleSetupForm } from "@/components/RoleSetupForm";
 import { NewStudentForm } from "@/components/NewStudentForm";
 import { NewApprovalDashboard } from "@/components/NewApprovalDashboard";
@@ -69,14 +67,15 @@ const Index = () => {
           setAppState("dashboard");
         }
       } else {
-        // Create profile if doesn't exist
+        // Create profile if doesn't exist - determine role from email domain
+        const role = user.email?.endsWith('@sonatech.ac.in') ? 'student' : 'class_teacher';
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
           .insert({
             user_id: user.id,
             email: user.email,
             full_name: user.user_metadata?.full_name || 'User',
-            role: 'student'
+            role: role
           })
           .select()
           .single();
@@ -102,7 +101,12 @@ const Index = () => {
 
   const handleLogin = async (user: any) => {
     setUser(user);
-    await fetchUserProfile(user);
+    // For students, skip role selection and go directly to login
+    if (user.email?.endsWith('@sonatech.ac.in')) {
+      await fetchUserProfile(user);
+    } else {
+      await fetchUserProfile(user);
+    }
   };
 
   const handleLogout = async () => {
@@ -136,19 +140,9 @@ const Index = () => {
     return <RoleSelector onRoleSelect={handleRoleSelect} />;
   }
 
-  if (appState === "login" && selectedRole === "student") {
+  if (appState === "login") {
     return (
-      <LoginForm
-        role={selectedRole}
-        onBack={handleBackToRoles}
-        onLogin={handleLogin}
-      />
-    );
-  }
-
-  if (appState === "login" && selectedRole !== "student") {
-    return (
-      <PhoneOTPLoginForm
+      <OTPLoginForm
         role={selectedRole}
         onBack={handleBackToRoles}
         onLogin={handleLogin}

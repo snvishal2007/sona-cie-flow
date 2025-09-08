@@ -74,11 +74,11 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
     setLoading(true);
 
     try {
-      // Validate email format for Outlook
-      if (!email.includes('@') || (!email.endsWith('.ac.in') && !email.includes('outlook'))) {
+      // Validate email format - only @sonatech.ac.in emails allowed
+      if (!email.endsWith('@sonatech.ac.in')) {
         toast({
           title: "Invalid Email",
-          description: "Please use your official Outlook email ID",
+          description: "Please use your institutional email address (@sonatech.ac.in)",
           variant: "destructive"
         });
         return;
@@ -178,7 +178,7 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
               {getRoleTitle(role)} Login
             </CardTitle>
             <CardDescription>
-              Sign in with your official Outlook email using OTP
+              Sign in with your institutional email using OTP
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -186,14 +186,14 @@ export const OTPLoginForm = ({ role, onBack, onLogin }: OTPLoginFormProps) => {
               <form onSubmit={handleSendOTP} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-academic-navy">
-                    Official Outlook Email
+                    Institutional Email
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-academic-gray" />
                     <Input
                       id="email"
                       type="email"
-                      placeholder="your.name@outlook.com or @sonatech.ac.in"
+                      placeholder="your.rollno@sonatech.ac.in"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10"

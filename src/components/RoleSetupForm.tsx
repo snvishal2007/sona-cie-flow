@@ -23,9 +23,12 @@ const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
 const sections = ["A", "B", "C"];
 
 export const RoleSetupForm = ({ user, onSetupComplete }: RoleSetupFormProps) => {
+  // Determine role from email domain
+  const userRole = user.email?.endsWith('@sonatech.ac.in') ? 'student' : 'class_teacher';
+  
   const [profile, setProfile] = useState({
     fullName: "",
-    role: "",
+    role: userRole,
     department: "",
     semester: "",
     section: "",
@@ -140,18 +143,11 @@ export const RoleSetupForm = ({ user, onSetupComplete }: RoleSetupFormProps) => 
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
-                  <Select onValueChange={(value) => setProfile({...profile, role: value})} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="student">Student</SelectItem>
-                      <SelectItem value="class_teacher">Class Teacher</SelectItem>
-                      <SelectItem value="faculty">Faculty</SelectItem>
-                      <SelectItem value="hod">Head of Department</SelectItem>
-                      <SelectItem value="coe">COE</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    value={userRole === 'student' ? 'Student' : 'Class Teacher'}
+                    disabled
+                    className="bg-gray-100"
+                  />
                 </div>
               </div>
 
