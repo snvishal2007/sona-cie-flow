@@ -42,9 +42,12 @@ const handler = async (req: Request): Promise<Response> => {
       return titles[role] || role;
     };
 
+    // For development, send to the account owner's email if domain not verified
+    const targetEmail = email.includes('@sonatech.ac.in') ? 'snvishal2007@gmail.com' : email;
+    
     const emailResponse = await resend.emails.send({
-      from: "Sonatech Authentication <onboarding@resend.dev>",
-      to: [email],
+      from: "Sonatech Authentication <snvishal2007@gmail.com>",
+      to: [targetEmail],
       subject: `Your ${getRoleTitle(role)} Login OTP - Sonatech`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
