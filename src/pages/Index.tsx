@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { RoleSelector } from "@/components/RoleSelector";
-import { OTPLoginForm } from "@/components/OTPLoginForm";
+import AuthForm from "@/components/AuthForm";
 import { RoleSetupForm } from "@/components/RoleSetupForm";
 import { NewStudentForm } from "@/components/NewStudentForm";
 import { NewApprovalDashboard } from "@/components/NewApprovalDashboard";
@@ -67,8 +67,8 @@ const Index = () => {
           setAppState("dashboard");
         }
       } else {
-        // Create profile if doesn't exist - determine role from email domain
-        const role = user.email?.endsWith('@sonatech.ac.in') ? 'student' : 'class_teacher';
+        // Create profile if doesn't exist - get role from user metadata
+        const role = user.user_metadata?.role || 'student';
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
           .insert({
@@ -142,10 +142,9 @@ const Index = () => {
 
   if (appState === "login") {
     return (
-      <OTPLoginForm
+      <AuthForm
         role={selectedRole}
         onBack={handleBackToRoles}
-        onLogin={handleLogin}
       />
     );
   }

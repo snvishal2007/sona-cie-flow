@@ -182,7 +182,13 @@ export type Database = {
         | "approved_by_coe"
         | "rejected"
       application_type: "retest" | "improvement"
-      user_role: "student" | "class_teacher" | "faculty" | "hod" | "coe"
+      user_role:
+        | "student"
+        | "class_teacher"
+        | "faculty"
+        | "hod"
+        | "coe"
+        | "class-teacher"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -319,7 +325,14 @@ export const Constants = {
         "rejected",
       ],
       application_type: ["retest", "improvement"],
-      user_role: ["student", "class_teacher", "faculty", "hod", "coe"],
+      user_role: [
+        "student",
+        "class_teacher",
+        "faculty",
+        "hod",
+        "coe",
+        "class-teacher",
+      ],
     },
   },
 } as const
